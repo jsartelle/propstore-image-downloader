@@ -1,6 +1,8 @@
 import { access, mkdir, readFile, writeFile } from 'fs/promises'
 import { JSDOM } from 'jsdom'
 
+const LOT_ID = 377
+
 /** @type {string[]} */
 let lotURLs = []
 /** @type {Record<string, string[]>} */
@@ -13,24 +15,25 @@ let downloadCount = 0,
   failedCount = 0
 
 /* Create the cache folder if it doesn't exist */
+const CACHE_PATH = `cache/${LOT_ID}`
 try {
-  await access('cache')
+  await access(CACHE_PATH)
 } catch {
-  mkdir('cache')
+  mkdir(CACHE_PATH)
 }
 
 /* Get the links to all the lot pages */
 try {
   /* Check for cached lot URLs */
   lotURLs = JSON.parse(
-    await readFile('cache/lotURLs.json', { encoding: 'utf-8' })
+    await readFile(`${CACHE_PATH}/lotURLs.json`, { encoding: 'utf-8' })
   )
   console.log('Using cached lot URLs')
 } catch {
   console.log('Getting lot URLs...')
   for (let index = 1; index <= 12; index++) {
     const document = await getDocument(
-      `https://propstoreauction.com/auctions/catalog/id/377?page=${index}`
+      `https://propstoreauction.com/auctions/catalog/id/${LOT_ID}?page=${index}`
     )
 
     /* Find all the lot links */
@@ -41,7 +44,7 @@ try {
   }
 
   /* Save them to the cache file */
-  await writeFile('cache/lotURLs.json', JSON.stringify(lotURLs), {
+  await writeFile(`${CACHE_PATH}/lotURLs.json`, JSON.stringify(lotURLs), {
     encoding: 'utf-8',
   })
 }
@@ -50,7 +53,7 @@ try {
 try {
   /* Check for cached image URLs */
   imageURLs = JSON.parse(
-    await readFile('cache/imageURLs.json', { encoding: 'utf-8' })
+    await readFile(`${CACHE_PATH}/imageURLs.json`, { encoding: 'utf-8' })
   )
   console.log('Using cached image URLs')
 } catch {
@@ -74,7 +77,7 @@ try {
   }
 
   /* Save them to the cache file */
-  await writeFile('cache/imageURLs.json', JSON.stringify(imageURLs), {
+  await writeFile(`${CACHE_PATH}/imageURLs.json`, JSON.stringify(imageURLs), {
     encoding: 'utf-8',
   })
 }
@@ -84,7 +87,7 @@ console.log('Starting download...')
 for (const [lotName, urls] of Object.entries(imageURLs)) {
   /* Remove unsafe file name characters */
   const lotNameSafe = lotName.replace(/[\\/:"*?<>|]+/g, '-')
-  const folderPath = `images/${lotNameSafe}`
+  const folderPath = `images/${LOT_ID}/${lotNameSafe}`
 
   /* Make a folder for the lot if it doesn't exist */
   try {
