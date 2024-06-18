@@ -1,7 +1,10 @@
 import { access, mkdir, readFile, writeFile } from 'fs/promises'
 import { JSDOM } from 'jsdom'
 
-const LOT_ID = 377
+/** @type {number} */
+const LOT_ID = 412
+/** @type {number} */
+const PAGE_COUNT = 14
 
 /** @type {string[]} */
 let lotURLs = []
@@ -31,14 +34,14 @@ try {
   console.log('Using cached lot URLs')
 } catch {
   console.log('Getting lot URLs...')
-  for (let index = 1; index <= 12; index++) {
+  for (let index = 1; index <= PAGE_COUNT; index++) {
     const document = await getDocument(
       `https://propstoreauction.com/auctions/catalog/id/${LOT_ID}?page=${index}`
     )
 
     /* Find all the lot links */
     /** @type {NodeListOf<HTMLAnchorElement>} */
-    const links = document.querySelectorAll('a.auc-lot-link')
+    const links = document.querySelectorAll('a.yaaa')
     const urls = Array.from(links).map((link) => link.href)
     lotURLs.push(...urls)
   }
