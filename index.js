@@ -1,5 +1,5 @@
 import { access, mkdir, readFile, writeFile } from 'fs/promises'
-import { JSDOM, ResourceLoader } from 'jsdom'
+import { JSDOM } from 'jsdom'
 
 /** @type {number} */
 const LOT_ID = 412
